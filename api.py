@@ -114,3 +114,11 @@ def fillSetContentWithWords(loginedSession, setId, userId, wordsWithMeaning):
     payload = {"data_obj":strp}
     r = loginedSession.post('https://www.classcard.net/CreateWord/saveCard2', data=payload)
     return r.json()
+
+def setSetAllowance(loginedSession, setId, public, allowEdit):
+    payload = {
+        'set_idx': setId,
+        'open_yn': int(public),
+        'allow_edit_yn': int(allowEdit)
+    }
+    return loginedSession.post("https://www.classcard.net/AuthAsync/set_open_allow_yn", data=payload).json()

@@ -1,4 +1,6 @@
 import api
+import include_csv
+import logindata
 
 def main(id, pw, words):
     result = api.login(id, pw)
@@ -8,12 +10,12 @@ def main(id, pw, words):
     
     session = result['session']
     userId = result['userId']
-    result = api.createEmptySet(session, userId, "Test")
+    result = api.createEmptyEnglishSet(session, userId, "Test")
     if(result['result'] != 'ok'):
         print(result)
         return
     setId = result['setId']
-    result = api.fillSetContentWithWords(session, setId, userId, words)
+    result = api.fillSetContentWithEnglishWords(session, setId, userId, words)
     if(result['result'] == 'ok'):
         result = api.setSetAllowance(session, setId, True, False)
         print("Created Set; Id {} User {}".format(setId, userId))
@@ -21,4 +23,5 @@ def main(id, pw, words):
         print(result)
 
 if __name__ == "__main__":
-    main("", "", [["hello", ""], ["word", "단어"]])
+    words = include_csv.getWordsAndMeaningsPairColumnData("./voc.csv")
+    main(logindata.UserId, logindata.UserPw, words)

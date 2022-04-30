@@ -1,5 +1,13 @@
 import requests, bs4
 
+Languages = {
+    'chinese':'zh',
+    'english':'en',
+    'korean':'ko',
+    'japanese':'ja',
+    'arabic':'ar'
+}
+
 def createList(val, size):
     r = []
     for i in range(0, size):
@@ -46,7 +54,47 @@ def login(id, pw):
     else:
         return result
 
-def createEmptySet(loginedSession, userId, setName):
+def createEmptySet(loginedSession, userId, setName, startLanguage, endLanguage):
+    payload = {
+        'set_idx': -1,
+        'user_idx': userId,
+        'login_user_idx': userId,
+        'set_type': 2,
+        'front_lang': startLanguage,
+        'back_lang': endLanguage,
+        'open_yn': 0,
+        'allow_edit_yn': 0,
+        'footer_yn': 0,
+        'footer_text': '',
+        'bg_path': '/images/pattern01.jpg',
+        'map_type': 1,
+        'map_box_color': '',
+        'map_img_path': '',
+        'card_cnt': 1,
+        'is_copy': 0,
+        'copy_from_set_idx': -1,
+        'dir_idx': 0,
+        'is_battle_page': 0,
+        'from': '',
+        'video_url': '',
+        'video_start': 0,
+        'video_end': 0, 
+        'caption': '',
+        'caption_type': '',
+        'ptn_idx': 0,
+        'tsl': -1,
+        'ts': -1,
+        'name': setName,
+        'set_url':'' 
+    }
+    r = loginedSession.post('https://www.classcard.net/CreateWord/saveSet', data=payload)
+    result = r.json()
+    if(result['result'] == 'ok'):
+        return {'result': 'ok','setId': result['msg']}
+    else:
+        return result
+
+def createEmptyEnglishSet(loginedSession, userId, setName):
     payload = {
         'set_idx': -1,
         'user_idx': userId,
@@ -86,7 +134,7 @@ def createEmptySet(loginedSession, userId, setName):
     else:
         return result
 
-def fillSetContentWithWords(loginedSession, setId, userId, wordsWithMeaning):
+def fillSetContentWithEnglishWords(loginedSession, setId, userId, wordsWithMeaning):
     wordsLen = len(wordsWithMeaning)
     audiopaths = []
     meanings = []
@@ -108,6 +156,22 @@ def fillSetContentWithWords(loginedSession, setId, userId, wordsWithMeaning):
     payload['back'] = meanings
     payload['audio_path'] = audiopaths
 
+    strp = str(payload)
+    strp = strp.replace("'", '"')
+    strp = strp.replace(' ', '')
+    payload = {"data_obj":strp}
+    r = loginedSession.post('https://www.classcard.net/CreateWord/saveCard2', data=payload)
+    return r.json()
+
+def fillSetContent(loginedSession, setId, userId, words, meanings):
+    wordsLen = len(words)
+    minus1List = createList("-1", wordsLen)
+    zeroList = createList("0", wordsLen)
+    emptyStrList = createList("", wordsLen)
+    orderList = orderingList(wordsLen)
+    payload = {"set_idx":str(setId),"user_idx":str(userId),"login_user_idx":str(userId),"set_type":"1","footer_yn":"0","front_lang":"en","img_path":emptyStrList,"audio_path":emptyStrList,"card_idx":minus1List,"map_bubble_type":emptyStrList,"deleted":zeroList,"card_order":orderList,"upload_idx":minus1List,"image_type":minus1List,"external_url":emptyStrList,"img_idx":minus1List,"es_idx":minus1List,"front":[],"back":[],"example":emptyStrList}
+    payload['front'] = words
+    payload['back'] = meanings
     strp = str(payload)
     strp = strp.replace("'", '"')
     strp = strp.replace(' ', '')

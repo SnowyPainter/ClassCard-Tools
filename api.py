@@ -175,6 +175,7 @@ def fillSetContent(loginedSession, setId, userId, words, meanings):
     strp = str(payload)
     strp = strp.replace("'", '"')
     strp = strp.replace(' ', '')
+    strp = strp.replace('\t',' ')
     payload = {"data_obj":strp}
     r = loginedSession.post('https://www.classcard.net/CreateWord/saveCard2', data=payload)
     return r.json()

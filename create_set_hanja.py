@@ -29,6 +29,8 @@ if __name__ == "__main__":
         reader = csv.reader(f)
         for row in reader:
             s = row[0]
+            m = s[1:]
+            m = m.replace(' ', '\t')
             hanjalist.append(s[0])
-            meanings.append(s[1:])
+            meanings.append(m)
     main(logindata.UserId, logindata.UserPw, hanjalist, meanings)

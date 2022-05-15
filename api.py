@@ -1,4 +1,4 @@
-import requests, bs4
+import requests, bs4, re
 
 Languages = {
     'chinese':'zh',
@@ -33,6 +33,23 @@ def getWordData(session, word):
         'back':msg['meaning'],
         'front':word
     }
+
+def getSetContents(setId):
+    url = "https://www.classcard.net/set/"+setId
+    html = requests.get(url).text
+    soup = bs4.BeautifulSoup(html, 'html.parser')
+    tags = soup.find_all('div', {'class':'card-content'})
+    i = 0;
+    front = []
+    back = []
+    for tag in tags:
+        val = tag.text.strip()
+        if(i%2 == 0):
+            front.append(val)
+        else:
+            back.append(val)
+        i+=1
+    return front, back
 
 def login(id, pw):
     html = requests.get('https://www.classcard.net/Login').text

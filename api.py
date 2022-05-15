@@ -8,6 +8,11 @@ Languages = {
     'arabic':'ar'
 }
 
+DataType = {
+    '1':"영어 단어 세트",
+    '2':"일반 단어 세트"
+}
+
 def createList(val, size):
     r = []
     for i in range(0, size):
@@ -71,6 +76,36 @@ def login(id, pw):
     else:
         return result
 
+def _getSets(loginedSession, token):
+    html = loginedSession.get("https://www.classcard.net/"+token).text
+    doc = bs4.BeautifulSoup(html, 'html.parser')
+    sets = doc.find_all("div", {"class":"set-items set-items-h-60"})
+    return sets
+
+def getMySets(loginedSession):
+    sets = _getSets(loginedSession, "make")    
+    result = []
+    for s in sets:
+        result.append({
+            "name": s.find_all("span", {"class":"set-name-copy-text"})[0].text.strip(),
+            "id": s['data-idx'],
+            "count": s['data-cnt'],
+            "type": s['data-type']
+        })
+    return result
+
+def getUsedSets(loginedSession):
+    sets = _getSets(loginedSession, "Main")    
+    result = []
+    for s in sets:
+        result.append({
+            "name": s.find_all("span", {"class":"set-name-copy-text"})[0].text.strip(),
+            "id": s['data-idx'],
+            "count": s['data-cnt'],
+            "type": s['data-type']
+        })
+    return result
+    
 def createEmptySet(loginedSession, userId, setName, startLanguage, endLanguage):
     payload = {
         'set_idx': -1,

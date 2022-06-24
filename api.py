@@ -105,7 +105,7 @@ def getUsedSets(loginedSession):
             "type": s['data-type']
         })
     return result
-    
+
 def createEmptySet(loginedSession, userId, setName, startLanguage, endLanguage):
     payload = {
         'set_idx': -1,

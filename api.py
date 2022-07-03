@@ -39,8 +39,13 @@ def getWordData(session, word):
         'front':word
     }
 
+def _pretty(s):
+    s = s.replace('\r', ', ')
+    s = s.replace('"', '')
+    return s
+
 def getSetContents(setId):
-    url = "https://www.classcard.net/set/"+setId
+    url = "https://www.classcard.net/set/"+str(setId)
     html = requests.get(url).text
     soup = bs4.BeautifulSoup(html, 'html.parser')
     tags = soup.find_all('div', {'class':'card-content'})
@@ -52,6 +57,7 @@ def getSetContents(setId):
         if(i%2 == 0):
             front.append(val)
         else:
+            val = _pretty(val)
             back.append(val)
         i+=1
     return front, back
